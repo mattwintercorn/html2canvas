@@ -43,15 +43,23 @@ exports.decode64 = function(base64) {
     return output;
 };
 
+function posTop() {
+    return (typeof window.pageYOffset !== 'undefined') ? window.pageYOffset :
+        document.documentElement.scrollTop ? document.documentElement.scrollTop :
+        document.body.scrollTop ? document.body.scrollTop : 0;
+}
+
 exports.getBounds = function(node) {
     if (node.getBoundingClientRect) {
         var clientRect = node.getBoundingClientRect();
         var width = node.offsetWidth == null ? clientRect.width : node.offsetWidth;
+        var offsetY = node.scrollTop || posTop() || node._scrollTop || 0.0;
+        var offsetX = node.scrollLeft || window.scrollX || node._scrollLeft || 0.0;
         return {
-            top: clientRect.top,
-            bottom: clientRect.bottom || (clientRect.top + clientRect.height),
-            right: clientRect.left + width,
-            left: clientRect.left,
+            top: clientRect.top + offsetY,
+            bottom: (clientRect.bottom + offsetY) || (clientRect.top + clientRect.height + offsetY),
+            right: clientRect.left + offsetX + width,
+            left: clientRect.left + offsetX,
             width:  width,
             height: node.offsetHeight == null ? clientRect.height : node.offsetHeight
         };
